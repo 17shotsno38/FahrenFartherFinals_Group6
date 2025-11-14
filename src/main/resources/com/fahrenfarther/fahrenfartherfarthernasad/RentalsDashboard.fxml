@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.fahrenfarther.fahrenfartherfarthernasad.RentalsController"
+            style="-fx-background-color: #f5f6fa;">
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox style="-fx-background-color: #e8eaf0; -fx-pref-width: 200px;">
+            <padding><Insets top="20" right="15" bottom="20" left="15"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <VBox.margin><Insets bottom="40"/></VBox.margin>
+                <ImageView fitHeight="70" fitWidth="140" preserveRatio="true">
+                    <Image url="@FahrenProject.png"/>
+                </ImageView>
+            </HBox>
+
+            <Label text="Menu" style="-fx-text-fill: #8b8d9a; -fx-font-size: 11px;">
+                <VBox.margin><Insets bottom="10"/></VBox.margin>
+            </Label>
+
+            <VBox spacing="5">
+                <HBox alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 10; -fx-cursor: hand;"
+                      onMouseClicked="#handleDashboardClick">
+                    <Label text="📊" style="-fx-font-size: 16px;"/>
+                    <Label text="Dashboard" style="-fx-font-size: 13px; -fx-text-fill: #6b6d7a;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 10; -fx-cursor: hand;"
+                      onMouseClicked="#handleCarsClick">
+                    <Label text="🚗" style="-fx-font-size: 16px;"/>
+                    <Label text="Cars" style="-fx-font-size: 13px; -fx-text-fill: #6b6d7a;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 10; -fx-cursor: hand;"
+                      onMouseClicked="#handleUsersClick">
+                    <Label text="👥" style="-fx-font-size: 16px;"/>
+                    <Label text="Users" style="-fx-font-size: 13px; -fx-text-fill: #6b6d7a;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-background-color: #d4d7e3; -fx-background-radius: 8; -fx-padding: 10;">
+                    <Label text="📄" style="-fx-font-size: 16px;"/>
+                    <Label text="Rentals" style="-fx-font-weight: 600; -fx-font-size: 13px;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Main Content Area -->
+    <center>
+        <VBox spacing="20">
+            <padding><Insets top="30" right="40" bottom="30" left="40"/></padding>
+
+            <!-- Header with New Rental Button -->
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Rentals" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                    <Label text="Manage car rentals"
+                           style="-fx-text-fill: #8b8d9a; -fx-font-size: 13px;"/>
+                </VBox>
+
+                <Button fx:id="btnNewRental" text="+ New Rental" onAction="#handleNewRentalClick"
+                        style="-fx-background-color: #2d5a9d; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 20; -fx-font-size: 13px; -fx-font-weight: 600; -fx-cursor: hand;">
+                    <HBox.margin><Insets left="20"/></HBox.margin>
+                </Button>
+            </HBox>
+
+            <!-- Create New Rental Form (Initially Hidden) -->
+            <VBox fx:id="newRentalForm" spacing="15" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 25;" managed="false" visible="false">
+                <Label text="Create New Rental" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+                <!-- Customer and Car Row -->
+                <HBox spacing="15">
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="Customer" style="-fx-font-size: 13px;"/>
+                        <ComboBox fx:id="cmbCustomer" promptText="Select customer" maxWidth="Infinity"
+                                  style="-fx-background-color: #f5f6fa; -fx-background-radius: 6;"/>
+                    </VBox>
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="Car" style="-fx-font-size: 13px;"/>
+                        <ComboBox fx:id="cmbCar" promptText="Select car" maxWidth="Infinity"
+                                  style="-fx-background-color: #f5f6fa; -fx-background-radius: 6;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Start Date and End Date Row -->
+                <HBox spacing="15">
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="Start Date" style="-fx-font-size: 13px;"/>
+                        <DatePicker fx:id="dpStartDate" promptText="dd/mm/yyyy"
+                                    style="-fx-background-color: #f5f6fa; -fx-background-radius: 6;"
+                                    maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="End Date" style="-fx-font-size: 13px;"/>
+                        <DatePicker fx:id="dpEndDate" promptText="dd/mm/yyyy"
+                                    style="-fx-background-color: #f5f6fa; -fx-background-radius: 6;"
+                                    maxWidth="Infinity"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Total Cost and Status Row -->
+                <HBox spacing="15">
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="Total Cost (₱)" style="-fx-font-size: 13px;"/>
+                        <TextField fx:id="txtTotalCost" promptText="Auto-calculated" editable="false"
+                                   style="-fx-background-color: #f5f6fa; -fx-background-radius: 6; -fx-padding: 10;"/>
+                    </VBox>
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="Status" style="-fx-font-size: 13px;"/>
+                        <ComboBox fx:id="cmbStatus" maxWidth="Infinity"
+                                  style="-fx-background-color: #f5f6fa; -fx-background-radius: 6;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Buttons -->
+                <HBox spacing="10">
+                    <Button text="Create Rental" onAction="#handleCreateRentalClick"
+                            style="-fx-background-color: #2d5a9d; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 20; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                    <Button text="Cancel" onAction="#handleCancelClick"
+                            style="-fx-background-color: #e8eaf0; -fx-text-fill: #333; -fx-background-radius: 6; -fx-padding: 8 20; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
+
+            <!-- Rentals Table -->
+            <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20;" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tblRentals" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colCar" text="Car" prefWidth="250">
+                            <cellValueFactory>
+                                <javafx.scene.control.cell.PropertyValueFactory property="car" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="colStartDate" text="Start Date" prefWidth="150">
+                            <cellValueFactory>
+                                <javafx.scene.control.cell.PropertyValueFactory property="startDate" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="colEndDate" text="End Date" prefWidth="150">
+                            <cellValueFactory>
+                                <javafx.scene.control.cell.PropertyValueFactory property="endDate" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="colTotalCost" text="Total Cost" prefWidth="150">
+                            <cellValueFactory>
+                                <javafx.scene.control.cell.PropertyValueFactory property="totalCost" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="colAction" text="Action" prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+
+</BorderPane>

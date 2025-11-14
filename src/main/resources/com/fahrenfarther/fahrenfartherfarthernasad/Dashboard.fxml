@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.fahrenfarther.fahrenfartherfarthernasad.DBController"
+            style="-fx-background-color: #f5f6fa;">
+
+    <left>
+        <VBox style="-fx-background-color: #e8eaf0; -fx-pref-width: 200px;">
+            <padding><Insets top="20" right="15" bottom="20" left="15"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <VBox.margin><Insets bottom="40"/></VBox.margin>
+                <ImageView fitHeight="70" fitWidth="140" preserveRatio="true">
+                    <Image url="@FahrenProject.png"/>
+                </ImageView>
+            </HBox>
+
+            <Label text="Menu" style="-fx-text-fill: #8b8d9a; -fx-font-size: 11px;">
+                <VBox.margin><Insets bottom="10"/></VBox.margin>
+            </Label>
+
+            <VBox spacing="5">
+                <HBox alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-background-color: #d4d7e3; -fx-background-radius: 8; -fx-padding: 10;">
+                    <Label text="📊" style="-fx-font-size: 16px;"/>
+                    <Label text="Dashboard" style="-fx-font-weight: 600; -fx-font-size: 13px;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 10; -fx-cursor: hand;"
+                      onMouseClicked="#handleCarsClick">
+                    <Label text="🚗" style="-fx-font-size: 16px;"/>
+                    <Label text="Cars" style="-fx-font-size: 13px; -fx-text-fill: #6b6d7a;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 10; -fx-cursor: hand;"
+                      onMouseClicked="#handleUsersClick">
+                    <Label text="👥" style="-fx-font-size: 16px;"/>
+                    <Label text="Users" style="-fx-font-size: 13px; -fx-text-fill: #6b6d7a;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 10; -fx-cursor: hand;"
+                      onMouseClicked="#handleRentalsClick">
+                    <Label text="📄" style="-fx-font-size: 16px;"/>
+                    <Label text="Rentals" style="-fx-font-size: 13px; -fx-text-fill: #6b6d7a;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="30">
+            <padding><Insets top="30" right="40" bottom="30" left="40"/></padding>
+
+            <!-- Header -->
+            <VBox spacing="5">
+                <Label text="Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Label text="Overview of your car rental business"
+                       style="-fx-text-fill: #8b8d9a; -fx-font-size: 13px;"/>
+            </VBox>
+
+            <!-- Stats Cards Grid -->
+            <GridPane hgap="20" vgap="20">
+                <!-- Total Cars Card -->
+                <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 25;"
+                      GridPane.columnIndex="0" GridPane.rowIndex="0" spacing="15">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Total Cars" style="-fx-text-fill: #8b8d9a; -fx-font-size: 12px;"/>
+                            <Label fx:id="lblTotalCars" text="0" style="-fx-font-size: 32px; -fx-font-weight: bold;"/>
+                            <Label text="Available" style="-fx-text-fill: #8b8d9a; -fx-font-size: 11px;"/>
+                        </VBox>
+                        <Label text="🚗" style="-fx-font-size: 36px; -fx-text-fill: #d0d2db;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Total Users Card -->
+                <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 25;"
+                      GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="15">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Total Users" style="-fx-text-fill: #8b8d9a; -fx-font-size: 12px;"/>
+                            <Label fx:id="lblTotalUsers" text="0" style="-fx-font-size: 32px; -fx-font-weight: bold;"/>
+                            <Label text="Registered customers" style="-fx-text-fill: #8b8d9a; -fx-font-size: 11px;"/>
+                        </VBox>
+                        <Label text="👥" style="-fx-font-size: 36px; -fx-text-fill: #d0d2db;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Active Rentals Card -->
+                <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 25;"
+                      GridPane.columnIndex="2" GridPane.rowIndex="0" spacing="15">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Active Rentals" style="-fx-text-fill: #8b8d9a; -fx-font-size: 12px;"/>
+                            <Label fx:id="lblActiveRentals" text="0" style="-fx-font-size: 32px; -fx-font-weight: bold;"/>
+                            <Label text="Currently active" style="-fx-text-fill: #8b8d9a; -fx-font-size: 11px;"/>
+                        </VBox>
+                        <Label text="📋" style="-fx-font-size: 36px; -fx-text-fill: #d0d2db;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Revenue Card -->
+                <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 25;"
+                      GridPane.columnIndex="3" GridPane.rowIndex="0" spacing="15">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Revenue" style="-fx-text-fill: #8b8d9a; -fx-font-size: 12px;"/>
+                            <Label fx:id="lblRevenue" text="₱0" style="-fx-font-size: 32px; -fx-font-weight: bold;"/>
+                            <Label text="This month" style="-fx-text-fill: #8b8d9a; -fx-font-size: 11px;"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </GridPane>
+        </VBox>
+    </center>
+
+</BorderPane>

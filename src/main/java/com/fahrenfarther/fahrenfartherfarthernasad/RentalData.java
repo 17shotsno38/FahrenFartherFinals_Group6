@@ -13,7 +13,7 @@ public class RentalData {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, rental.getCar());
-            pstmt.setString(2, "Customer"); // You can add customer field to Rental class
+            pstmt.setString(2, "Customer"); // You can add customer field to Rental class, because yes
             pstmt.setDate(3, Date.valueOf(rental.getStartDate()));
             pstmt.setDate(4, Date.valueOf(rental.getEndDate()));
             pstmt.setString(5, rental.getTotalCost());

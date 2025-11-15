@@ -4,15 +4,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.Node;
+import javafx.util.Callback;
+
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class UsersController {
-
     @FXML private Button btnAddUser;
     @FXML private VBox addUserForm;
     @FXML private TextField txtName;
@@ -24,23 +27,94 @@ public class UsersController {
     @FXML private TableColumn<User, String> dateOfBirthColumn;
     @FXML private TableColumn<User, String> contactNoColumn;
     @FXML private TableColumn<User, String> licenseNoColumn;
+    @FXML private TableColumn<User, Void> actionsColumn;
 
     private ObservableList<User> usersList;
 
     public void initialize() {
-        // Load sample user data
-        usersList = FXCollections.observableArrayList(
-                new User("Juan Dela Cruz", "1990-05-15", "09171234567", "N01-12-345678"),
-                new User("Maria Santos", "1985-08-22", "09181234567", "N02-13-456789"),
-                new User("Pedro Reyes", "1992-11-30", "09191234567", "N03-14-567890")
-        );
+        // Add delete button to Actions column
+        addDeleteButtonToTable();
 
-        usersTable.setItems(usersList);
+        // Load users from database
+        loadUsersFromDatabase();
+    }
+
+    private void addDeleteButtonToTable() {
+        Callback<TableColumn<User, Void>, TableCell<User, Void>> cellFactory = new Callback<>() {
+            @Override
+            public TableCell<User, Void> call(final TableColumn<User, Void> param) {
+                final TableCell<User, Void> cell = new TableCell<>() {
+                    private final Button btnDelete = new Button("Delete");
+
+                    {
+                        btnDelete.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 5 15; -fx-cursor: hand;");
+                        btnDelete.setOnAction(event -> {
+                            User user = getTableView().getItems().get(getIndex());
+                            handleDeleteUser(user);
+                        });
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btnDelete);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        actionsColumn.setCellFactory(cellFactory);
+    }
+
+    private void handleDeleteUser(User user) {
+        // Show confirmation dialog
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirm Delete");
+        confirmAlert.setHeaderText("Delete User");
+        confirmAlert.setContentText("Are you sure you want to delete: " + user.getName() + "?");
+
+        confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    UserData.deleteUser(user.getLicenseNo());
+                    loadUsersFromDatabase();
+
+                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                    successAlert.setTitle("Success");
+                    successAlert.setHeaderText("User Deleted");
+                    successAlert.setContentText("The user has been deleted successfully!");
+                    successAlert.showAndWait();
+
+                } catch (SQLException e) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Database Error");
+                    errorAlert.setHeaderText("Failed to delete user");
+                    errorAlert.setContentText("Error: " + e.getMessage());
+                    errorAlert.showAndWait();
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void loadUsersFromDatabase() {
+        try {
+            usersList = UserData.getAllUsers();
+            usersTable.setItems(usersList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            usersList = FXCollections.observableArrayList();
+            usersTable.setItems(usersList);
+        }
     }
 
     @FXML
     private void handleAddUserClick() {
-        System.out.println("Add User button clicked!"); // Debug
         addUserForm.setVisible(true);
         addUserForm.setManaged(true);
     }
@@ -63,19 +137,29 @@ public class UsersController {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String dateOfBirth = dobDate.format(formatter);
-
         User newUser = new User(name, dateOfBirth, contactNo, licenseNo);
-        usersList.add(newUser);
 
-        clearForm();
-        addUserForm.setVisible(false);
-        addUserForm.setManaged(false);
+        try {
+            UserData.insertUser(newUser);
+            loadUsersFromDatabase();
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Success");
-        alert.setHeaderText("User Added");
-        alert.setContentText("The user has been added successfully!");
-        alert.showAndWait();
+            clearForm();
+            addUserForm.setVisible(false);
+            addUserForm.setManaged(false);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Success");
+            alert.setHeaderText("User Added");
+            alert.setContentText("User saved to database!");
+            alert.showAndWait();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Database Error");
+            alert.setContentText("Error: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     @FXML

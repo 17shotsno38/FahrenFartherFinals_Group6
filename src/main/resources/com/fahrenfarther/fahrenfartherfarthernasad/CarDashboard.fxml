@@ -135,26 +135,27 @@
             <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20;" VBox.vgrow="ALWAYS">
                 <TableView fx:id="tblCars" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colModel" text="Model" prefWidth="300">
+                        <TableColumn fx:id="colModel" text="Model" prefWidth="250">
                             <cellValueFactory>
                                 <javafx.scene.control.cell.PropertyValueFactory property="model" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="colYear" text="Year" prefWidth="150">
+                        <TableColumn fx:id="colYear" text="Year" prefWidth="100">
                             <cellValueFactory>
                                 <javafx.scene.control.cell.PropertyValueFactory property="year" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="colLicensePlate" text="License Plate" prefWidth="200">
+                        <TableColumn fx:id="colLicensePlate" text="License Plate" prefWidth="150">
                             <cellValueFactory>
                                 <javafx.scene.control.cell.PropertyValueFactory property="licensePlate" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="colDailyRate" text="Daily Rate" prefWidth="150">
+                        <TableColumn fx:id="colDailyRate" text="Daily Rate" prefWidth="120">
                             <cellValueFactory>
                                 <javafx.scene.control.cell.PropertyValueFactory property="dailyRate" />
                             </cellValueFactory>
                         </TableColumn>
+                        <TableColumn fx:id="colActions" text="Actions" prefWidth="120" />
                     </columns>
                 </TableView>
             </VBox>

@@ -4,10 +4,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.Node;
+import javafx.util.Callback;
 import java.sql.SQLException;
 
 public class CarController {
@@ -25,6 +27,7 @@ public class CarController {
     @FXML private TableColumn<Car, Integer> colYear;
     @FXML private TableColumn<Car, String> colLicensePlate;
     @FXML private TableColumn<Car, String> colDailyRate;
+    @FXML private TableColumn<Car, Void> colActions;
 
     private ObservableList<Car> carsList;
 
@@ -35,8 +38,74 @@ public class CarController {
         ));
         cmbStatus.setValue("Available");
 
+        // Add delete button to Actions column
+        addDeleteButtonToTable();
+
         // Load cars from database
         loadCarsFromDatabase();
+    }
+
+    private void addDeleteButtonToTable() {
+        Callback<TableColumn<Car, Void>, TableCell<Car, Void>> cellFactory = new Callback<>() {
+            @Override
+            public TableCell<Car, Void> call(final TableColumn<Car, Void> param) {
+                final TableCell<Car, Void> cell = new TableCell<>() {
+                    private final Button btnDelete = new Button("Delete");
+
+                    {
+                        btnDelete.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 5 15; -fx-cursor: hand;");
+                        btnDelete.setOnAction(event -> {
+                            Car car = getTableView().getItems().get(getIndex());
+                            handleDeleteCar(car);
+                        });
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btnDelete);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        colActions.setCellFactory(cellFactory);
+    }
+
+    private void handleDeleteCar(Car car) {
+        // Show confirmation dialog
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirm Delete");
+        confirmAlert.setHeaderText("Delete Car");
+        confirmAlert.setContentText("Are you sure you want to delete: " + car.getModel() + "?");
+
+        confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    CarData.deleteCar(car.getLicensePlate());
+                    loadCarsFromDatabase();
+
+                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                    successAlert.setTitle("Success");
+                    successAlert.setHeaderText("Car Deleted");
+                    successAlert.setContentText("The car has been deleted successfully!");
+                    successAlert.showAndWait();
+
+                } catch (SQLException e) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Database Error");
+                    errorAlert.setHeaderText("Failed to delete car");
+                    errorAlert.setContentText("Error: " + e.getMessage());
+                    errorAlert.showAndWait();
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void loadCarsFromDatabase() {
@@ -46,7 +115,6 @@ public class CarController {
 
     @FXML
     private void handleAddCarClick() {
-        // Show the form
         addCarForm.setVisible(true);
         addCarForm.setManaged(true);
     }
@@ -75,11 +143,7 @@ public class CarController {
             String formattedRate = "₱" + dailyRate;
 
             Car newCar = new Car(fullModel, year, licensePlate, formattedRate);
-
-
             CarData.insertCar(newCar);
-
-
             loadCarsFromDatabase();
 
             clearForm();

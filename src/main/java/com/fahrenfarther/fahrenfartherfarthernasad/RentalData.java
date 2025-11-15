@@ -13,7 +13,7 @@ public class RentalData {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, rental.getCar());
-            pstmt.setString(2, "Customer"); // You can add customer field to Rental class, because yes
+            pstmt.setString(2, customer);
             pstmt.setDate(3, Date.valueOf(rental.getStartDate()));
             pstmt.setDate(4, Date.valueOf(rental.getEndDate()));
             pstmt.setString(5, rental.getTotalCost());
@@ -32,12 +32,14 @@ public class RentalData {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                rentals.add(new Rental(
+                Rental rental = new Rental(
                         rs.getString("car"),
                         rs.getDate("start_date").toString(),
                         rs.getDate("end_date").toString(),
                         rs.getString("total_cost")
-                ));
+                );
+                rental.setId(rs.getInt("id")); // IMPORTANT: Set the ID!
+                rentals.add(rental);
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -121,26 +121,27 @@
             <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20;" VBox.vgrow="ALWAYS">
                 <TableView fx:id="usersTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="nameColumn" text="Name" prefWidth="250">
+                        <TableColumn fx:id="nameColumn" text="Name" prefWidth="200">
                             <cellValueFactory>
                                 <javafx.scene.control.cell.PropertyValueFactory property="name" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="dateOfBirthColumn" text="Date of Birth" prefWidth="150">
+                        <TableColumn fx:id="dateOfBirthColumn" text="Date of Birth" prefWidth="130">
                             <cellValueFactory>
                                 <javafx.scene.control.cell.PropertyValueFactory property="dateOfBirth" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="contactNoColumn" text="Contact No." prefWidth="150">
+                        <TableColumn fx:id="contactNoColumn" text="Contact No." prefWidth="130">
                             <cellValueFactory>
                                 <javafx.scene.control.cell.PropertyValueFactory property="contactNo" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="licenseNoColumn" text="License No." prefWidth="200">
+                        <TableColumn fx:id="licenseNoColumn" text="License No." prefWidth="180">
                             <cellValueFactory>
                                 <javafx.scene.control.cell.PropertyValueFactory property="licenseNo" />
                             </cellValueFactory>
                         </TableColumn>
+                        <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="120" />
                     </columns>
                 </TableView>
             </VBox>

@@ -1,6 +1,7 @@
 package com.fahrenfarther.fahrenfartherfarthernasad;
 
 public class Rental {
+    private int id;
     private String car;
     private String startDate;
     private String endDate;
@@ -13,15 +14,17 @@ public class Rental {
         this.totalCost = totalCost;
     }
 
+    // Getters
+    public int getId() { return id; }
     public String getCar() { return car; }
-    public void setCar(String car) { this.car = car; }
-
     public String getStartDate() { return startDate; }
-    public void setStartDate(String startDate) { this.startDate = startDate; }
-
     public String getEndDate() { return endDate; }
-    public void setEndDate(String endDate) { this.endDate = endDate; }
-
     public String getTotalCost() { return totalCost; }
+
+    // Setters
+    public void setId(int id) { this.id = id; }
+    public void setCar(String car) { this.car = car; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
     public void setTotalCost(String totalCost) { this.totalCost = totalCost; }
 }

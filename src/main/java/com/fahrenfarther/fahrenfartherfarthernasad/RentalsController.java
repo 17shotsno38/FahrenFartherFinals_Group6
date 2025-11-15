@@ -8,6 +8,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.Node;
+import javafx.util.Callback;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -95,31 +96,67 @@ public class RentalsController {
     }
 
     private void addDeleteButtonToTable() {
-        colAction.setCellFactory(param -> new TableCell<>() {
-            private final Button deleteButton = new Button("Delete");
-
-            {
-                deleteButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 5 10;");
-                deleteButton.setOnAction(event -> {
-                    Rental rental = getTableView().getItems().get(getIndex());
-
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("Confirm Delete");
-                    alert.setHeaderText("Delete Rental");
-                    alert.setContentText("Are you sure you want to delete this rental for " + rental.getCar() + "?");
-
-                    alert.showAndWait().ifPresent(response -> {
-                        if (response == ButtonType.OK) {
-                            rentalsList.remove(rental);
-                        }
-                    });
-                });
-            }
-
+        Callback<TableColumn<Rental, Void>, TableCell<Rental, Void>> cellFactory = new Callback<>() {
             @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : deleteButton);
+            public TableCell<Rental, Void> call(final TableColumn<Rental, Void> param) {
+                final TableCell<Rental, Void> cell = new TableCell<>() {
+                    private final Button btnDelete = new Button("Delete");
+
+                    {
+                        btnDelete.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 5 15; -fx-cursor: hand;");
+                        btnDelete.setOnAction(event -> {
+                            Rental rental = getTableView().getItems().get(getIndex());
+                            handleDeleteRental(rental);
+                        });
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btnDelete);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        colAction.setCellFactory(cellFactory);
+    }
+
+    private void handleDeleteRental(Rental rental) {
+        // Show confirmation dialog
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirm Delete");
+        confirmAlert.setHeaderText("Delete Rental");
+        confirmAlert.setContentText("Are you sure you want to delete this rental for " + rental.getCar() + "?");
+
+        confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // Delete from database using rental ID
+                    RentalData.deleteRental(rental.getId());
+
+                    // Reload table from database
+                    loadRentalsFromDatabase();
+
+                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                    successAlert.setTitle("Success");
+                    successAlert.setHeaderText("Rental Deleted");
+                    successAlert.setContentText("The rental has been deleted successfully!");
+                    successAlert.showAndWait();
+
+                } catch (SQLException e) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Database Error");
+                    errorAlert.setHeaderText("Failed to delete rental");
+                    errorAlert.setContentText("Error: " + e.getMessage());
+                    errorAlert.showAndWait();
+                    e.printStackTrace();
+                }
             }
         });
     }

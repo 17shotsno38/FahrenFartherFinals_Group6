@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.util.Callback;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -32,39 +31,39 @@ public class UsersController {
     private ObservableList<User> usersList;
 
     public void initialize() {
-        // Add delete button to Actions column
+        // ===== Setup Table Columns =====
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        dateOfBirthColumn.setCellValueFactory(new PropertyValueFactory<>("dateOfBirth"));
+        contactNoColumn.setCellValueFactory(new PropertyValueFactory<>("contactNo"));
+        licenseNoColumn.setCellValueFactory(new PropertyValueFactory<>("licenseNo"));
+
+        // Add Delete button to Actions column
         addDeleteButtonToTable();
 
-        // Load users from database
+        // Load users from mock database
         loadUsersFromDatabase();
     }
 
     private void addDeleteButtonToTable() {
-        Callback<TableColumn<User, Void>, TableCell<User, Void>> cellFactory = new Callback<>() {
+        Callback<TableColumn<User, Void>, TableCell<User, Void>> cellFactory = param -> new TableCell<>() {
+            private final Button btnDelete = new Button("Delete");
+
+            {
+                btnDelete.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 5 15; -fx-cursor: hand;");
+                btnDelete.setOnAction(event -> {
+                    User user = getTableView().getItems().get(getIndex());
+                    handleDeleteUser(user);
+                });
+            }
+
             @Override
-            public TableCell<User, Void> call(final TableColumn<User, Void> param) {
-                final TableCell<User, Void> cell = new TableCell<>() {
-                    private final Button btnDelete = new Button("Delete");
-
-                    {
-                        btnDelete.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 5 15; -fx-cursor: hand;");
-                        btnDelete.setOnAction(event -> {
-                            User user = getTableView().getItems().get(getIndex());
-                            handleDeleteUser(user);
-                        });
-                    }
-
-                    @Override
-                    public void updateItem(Void item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            setGraphic(btnDelete);
-                        }
-                    }
-                };
-                return cell;
+            public void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btnDelete);
+                }
             }
         };
 
@@ -72,7 +71,6 @@ public class UsersController {
     }
 
     private void handleDeleteUser(User user) {
-        // Show confirmation dialog
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirm Delete");
         confirmAlert.setHeaderText("Delete User");
@@ -80,37 +78,21 @@ public class UsersController {
 
         confirmAlert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                try {
-                    UserData.deleteUser(user.getLicenseNo());
-                    loadUsersFromDatabase();
+                MockDatabase.deleteUser(user.getLicenseNo());
+                loadUsersFromDatabase();
 
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                    successAlert.setTitle("Success");
-                    successAlert.setHeaderText("User Deleted");
-                    successAlert.setContentText("The user has been deleted successfully!");
-                    successAlert.showAndWait();
-
-                } catch (SQLException e) {
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                    errorAlert.setTitle("Database Error");
-                    errorAlert.setHeaderText("Failed to delete user");
-                    errorAlert.setContentText("Error: " + e.getMessage());
-                    errorAlert.showAndWait();
-                    e.printStackTrace();
-                }
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Success");
+                successAlert.setHeaderText("User Deleted");
+                successAlert.setContentText("The user has been deleted successfully!");
+                successAlert.showAndWait();
             }
         });
     }
 
     private void loadUsersFromDatabase() {
-        try {
-            usersList = UserData.getAllUsers();
-            usersTable.setItems(usersList);
-        } catch (Exception e) {
-            e.printStackTrace();
-            usersList = FXCollections.observableArrayList();
-            usersTable.setItems(usersList);
-        }
+        usersList = MockDatabase.getAllUsers();
+        usersTable.setItems(usersList);
     }
 
     @FXML
@@ -135,31 +117,21 @@ public class UsersController {
             return;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String dateOfBirth = dobDate.format(formatter);
+        String dateOfBirth = dobDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         User newUser = new User(name, dateOfBirth, contactNo, licenseNo);
 
-        try {
-            UserData.insertUser(newUser);
-            loadUsersFromDatabase();
+        MockDatabase.insertUser(newUser);
+        loadUsersFromDatabase();
 
-            clearForm();
-            addUserForm.setVisible(false);
-            addUserForm.setManaged(false);
+        clearForm();
+        addUserForm.setVisible(false);
+        addUserForm.setManaged(false);
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Success");
-            alert.setHeaderText("User Added");
-            alert.setContentText("User saved to database!");
-            alert.showAndWait();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Database Error");
-            alert.setContentText("Error: " + e.getMessage());
-            alert.showAndWait();
-        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText("User Added");
+        alert.setContentText("User saved successfully!");
+        alert.showAndWait();
     }
 
     @FXML
@@ -176,6 +148,7 @@ public class UsersController {
         txtLicenseNumber.clear();
     }
 
+    // ===== Navigation Buttons =====
     @FXML
     public void handleDashboardClick(MouseEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

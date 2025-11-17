@@ -6,10 +6,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class DBLauncher extends Application {
+
     @Override
     public void start(Stage stage) throws Exception {
-        // Initialize database
-        DatabaseManager.initializeDatabase();
+
+        // Initialize mock database with sample data
+        MockDatabase.initialize();
 
         FXMLLoader fxmlLoader = new FXMLLoader(DBLauncher.class.getResource("Dashboard.fxml"));
         Scene scene = new Scene(fxmlLoader.load());

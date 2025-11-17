@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.util.Callback;
-import java.sql.SQLException;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -37,9 +37,7 @@ public class RentalsController {
         loadCustomersFromDatabase();
         loadCarsFromDatabase();
 
-        cmbStatus.setItems(FXCollections.observableArrayList(
-                "Active", "Completed", "Cancelled"
-        ));
+        cmbStatus.setItems(FXCollections.observableArrayList("Active", "Completed", "Cancelled"));
         cmbStatus.setValue("Active");
 
         loadRentalsFromDatabase();
@@ -53,23 +51,19 @@ public class RentalsController {
     private void loadCustomersFromDatabase() {
         ObservableList<User> users = UserData.getAllUsers();
         ObservableList<String> customerNames = FXCollections.observableArrayList();
-
         for (User user : users) {
             customerNames.add(user.getName());
         }
-
         cmbCustomer.setItems(customerNames);
     }
 
     private void loadCarsFromDatabase() {
         ObservableList<Car> cars = CarData.getAllCars();
         ObservableList<String> carOptions = FXCollections.observableArrayList();
-
         for (Car car : cars) {
             String rateStr = car.getDailyRate().replace("₱", "").replace(",", "");
             carOptions.add(car.getModel() + " - ₱" + rateStr + "/day");
         }
-
         cmbCar.setItems(carOptions);
     }
 
@@ -89,7 +83,6 @@ public class RentalsController {
                 String rateStr = carSelection.split("₱")[1].split("/")[0].replace(",", "");
                 double dailyRate = Double.parseDouble(rateStr);
                 double total = dailyRate * days;
-
                 txtTotalCost.setText(String.format("₱%.0f", total));
             }
         }
@@ -113,22 +106,16 @@ public class RentalsController {
                     @Override
                     public void updateItem(Void item, boolean empty) {
                         super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            setGraphic(btnDelete);
-                        }
+                        setGraphic(empty ? null : btnDelete);
                     }
                 };
                 return cell;
             }
         };
-
         colAction.setCellFactory(cellFactory);
     }
 
     private void handleDeleteRental(Rental rental) {
-        // Show confirmation dialog
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirm Delete");
         confirmAlert.setHeaderText("Delete Rental");
@@ -136,27 +123,9 @@ public class RentalsController {
 
         confirmAlert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                try {
-                    // Delete from database using rental ID
-                    RentalData.deleteRental(rental.getId());
-
-                    // Reload table from database
-                    loadRentalsFromDatabase();
-
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                    successAlert.setTitle("Success");
-                    successAlert.setHeaderText("Rental Deleted");
-                    successAlert.setContentText("The rental has been deleted successfully!");
-                    successAlert.showAndWait();
-
-                } catch (SQLException e) {
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                    errorAlert.setTitle("Database Error");
-                    errorAlert.setHeaderText("Failed to delete rental");
-                    errorAlert.setContentText("Error: " + e.getMessage());
-                    errorAlert.showAndWait();
-                    e.printStackTrace();
-                }
+                RentalData.deleteRental(rental.getId());
+                loadRentalsFromDatabase();
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Rental Deleted", "The rental has been deleted successfully!");
             }
         });
     }
@@ -180,30 +149,17 @@ public class RentalsController {
             return;
         }
 
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String carName = car.split(" - ")[0];
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String carName = car.split(" - ")[0];
+        Rental newRental = new Rental(carName, startDate.format(formatter), endDate.format(formatter), totalCost);
+        RentalData.insertRental(newRental, customer);
+        loadRentalsFromDatabase();
 
-            Rental newRental = new Rental(
-                    carName,
-                    startDate.format(formatter),
-                    endDate.format(formatter),
-                    totalCost
-            );
+        clearForm();
+        newRentalForm.setVisible(false);
+        newRentalForm.setManaged(false);
 
-            RentalData.insertRental(newRental, customer);
-            loadRentalsFromDatabase();
-
-            clearForm();
-            newRentalForm.setVisible(false);
-            newRentalForm.setManaged(false);
-
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Rental Created", "The rental has been saved to the database!");
-
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to create rental", "Error: " + e.getMessage());
-            e.printStackTrace();
-        }
+        showAlert(Alert.AlertType.INFORMATION, "Success", "Rental Created", "The rental has been saved to the database!");
     }
 
     @FXML

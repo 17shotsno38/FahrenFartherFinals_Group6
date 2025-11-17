@@ -10,7 +10,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.util.Callback;
-import java.sql.SQLException;
 
 public class CarController {
 
@@ -38,10 +37,7 @@ public class CarController {
         ));
         cmbStatus.setValue("Available");
 
-        // Add delete button to Actions column
         addDeleteButtonToTable();
-
-        // Load cars from database
         loadCarsFromDatabase();
     }
 
@@ -78,7 +74,7 @@ public class CarController {
     }
 
     private void handleDeleteCar(Car car) {
-        // Show confirmation dialog
+
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirm Delete");
         confirmAlert.setHeaderText("Delete Car");
@@ -86,24 +82,16 @@ public class CarController {
 
         confirmAlert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                try {
-                    CarData.deleteCar(car.getLicensePlate());
-                    loadCarsFromDatabase();
 
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                    successAlert.setTitle("Success");
-                    successAlert.setHeaderText("Car Deleted");
-                    successAlert.setContentText("The car has been deleted successfully!");
-                    successAlert.showAndWait();
+                // DELETE without SQLException
+                CarData.deleteCar(car.getLicensePlate());
+                loadCarsFromDatabase();
 
-                } catch (SQLException e) {
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                    errorAlert.setTitle("Database Error");
-                    errorAlert.setHeaderText("Failed to delete car");
-                    errorAlert.setContentText("Error: " + e.getMessage());
-                    errorAlert.showAndWait();
-                    e.printStackTrace();
-                }
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Success");
+                successAlert.setHeaderText("Car Deleted");
+                successAlert.setContentText("The car has been deleted successfully!");
+                successAlert.showAndWait();
             }
         });
     }
@@ -121,6 +109,7 @@ public class CarController {
 
     @FXML
     private void handleSaveCarClick() {
+
         String brand = txtBrand.getText().trim();
         String model = txtModel.getText().trim();
         String yearStr = txtYear.getText().trim();
@@ -129,6 +118,7 @@ public class CarController {
 
         if (brand.isEmpty() || model.isEmpty() || yearStr.isEmpty() ||
                 licensePlate.isEmpty() || dailyRate.isEmpty()) {
+
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Validation Error");
             alert.setHeaderText("Missing Information");
@@ -143,6 +133,8 @@ public class CarController {
             String formattedRate = "₱" + dailyRate;
 
             Car newCar = new Car(fullModel, year, licensePlate, formattedRate);
+
+            // INSERT without SQLException
             CarData.insertCar(newCar);
             loadCarsFromDatabase();
 
@@ -157,18 +149,12 @@ public class CarController {
             alert.showAndWait();
 
         } catch (NumberFormatException e) {
+
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Invalid Input");
             alert.setHeaderText("Invalid Year");
             alert.setContentText("Please enter a valid year.");
             alert.showAndWait();
-        } catch (SQLException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Database Error");
-            alert.setHeaderText("Failed to save car");
-            alert.setContentText("Error: " + e.getMessage());
-            alert.showAndWait();
-            e.printStackTrace();
         }
     }
 
